@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>TODO list
+  </h1>
+  <a class="btn btn-primary link-to-page" href="{% url 'todo:task-create' %}">
+    Create task
+  </a>
+  <p>Welcome to your Todo list.</p>
+
+  <table class="table">
+
+    {% for task in task_list %}
+      <tr>
+        <td>
+          <h3>
+            {{ task.content }}
+            {% if task.condition %}<span style="color: green;">[Done]</span>{% else %}
+              <span style="color: red;">[Not Done]</span>{% endif %}
+          </h3>
+
+          <p>Created: {{ task.datetime }}</p>
+          <p>Tags: {% for tag in task.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+            <a class="btn btn-outline-primary" href="{% url 'todo:task-update' pk=task.id %}">Update Task</a>
+            <a class="btn btn-outline-danger" href="{% url 'todo:task-delete' pk=task.id %}">Delete Task</a></p>
+        </td>
+        <td>
+          <form method="post" action="{% url 'todo:index' %}">
+            {% csrf_token %}
+            <input type="hidden" name="task_id" value="{{ task.id }}">
+            {% if task.condition %}
+              <button class="btn btn-secondary" type="submit" name="action" value="undo">Undo ⎌</button>
+            {% else %}
+              <button class="btn btn-success" type="submit" name="action" value="complete">Task Complete!</button>
+            {% endif %}
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+
+{% endblock %}
